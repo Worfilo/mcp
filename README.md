@@ -162,7 +162,7 @@ The agent sees only the tools allowed by the permissions you grant. Publishing, 
 |---|---|---|
 | `list_node_types` | `workflows:read` | Node types available to workflow graphs |
 | `get_node_type` | `workflows:read` | Ports and configuration schema for one node type |
-| `list_integrations` | `workflows:read` | Connected apps and actions, credential names, custom APIs and MCP servers |
+| `list_integrations` | `workflows:read` | Connected apps and actions, credential names, saved LLM models and provider options, custom APIs and MCP servers |
 | `list_workflows` | `workflows:read` | Workflows with publish state and latest run |
 | `get_workflow` | `workflows:read` | Draft graph, published versions and the active version |
 | `validate_workflow` | `workflows:read` | The checks that publishing runs |
@@ -171,6 +171,7 @@ The agent sees only the tools allowed by the permissions you grant. Publishing, 
 | `plan_workflow` | `workflows:write` | Drafts a graph and a readable plan without saving |
 | `create_workflow` | `workflows:write` | Saves a new draft and returns validation issues |
 | `update_workflow` | `workflows:write` | Replaces a draft graph and returns validation issues |
+| `create_model` | `workflows:write` | Saves an LLM model (provider, model id, settings) on an existing credential, for agent nodes |
 | `publish_workflow` | `workflows:publish` | Publishes the draft as a new version, optionally activating it |
 | `activate_version` | `workflows:publish` | Selects the version the API runs |
 | `run_workflow` | `runs:write` | Runs the draft or published version and returns the result |
@@ -183,7 +184,7 @@ You choose the permissions on the consent screen when the agent first connects.
 | Scope | Allows |
 |---|---|
 | `workflows:read` | Reading workflows, node types, integrations and credential names. Always granted. |
-| `workflows:write` | Planning, creating and editing draft workflows. |
+| `workflows:write` | Planning, creating and editing draft workflows, and saving LLM models for agent nodes. |
 | `workflows:publish` | Publishing versions and changing the active version. |
 | `runs:write` | Running workflows and reading their results. |
 | `api_keys:write` | Creating API keys restricted to chosen workflows. |

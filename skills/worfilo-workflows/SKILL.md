@@ -10,7 +10,7 @@ Worfilo runs AI agent workflows: a trigger, then nodes (agents, app actions, HTT
 ## Procedure
 
 1. **Understand the goal.** Ask what should start the workflow, what it must produce, and which apps it touches. Read the codebase to see where it will be called from and what input it can send.
-2. **Discover.** Call `list_integrations` to see connected apps, credentials, custom APIs and MCP servers. Call `list_node_types`, then `get_node_type` for each type you plan to use. Never invent node types, ports or config fields.
+2. **Discover.** Call `list_integrations` to see connected apps, credentials, saved models, custom APIs and MCP servers. Call `list_node_types`, then `get_node_type` for each type you plan to use. Never invent node types, ports or config fields.
 3. **Plan.** Call `plan_workflow` with a precise description. It drafts a graph from the account's real integrations. Show the user the `steps` in plain words and agree on changes before saving. For revisions, pass `previous_graph` and an `instruction`.
 4. **Create.** Call `create_workflow` with the agreed graph. Fix every `error` in `issues` with `update_workflow` (it replaces the whole draft graph). Warnings do not block.
 5. **Test.** Call `run_workflow` on the draft with a realistic `input`. If it fails, read `failed_nodes`, fix the graph, and run again. Runs can call real apps and spend tokens, so say what a test run will do first.
@@ -30,7 +30,7 @@ Worfilo runs AI agent workflows: a trigger, then nodes (agents, app actions, HTT
     {"id": "trigger", "type": "manual_trigger", "name": "Trigger", "position": {"x": 0, "y": 0},
      "config": {"test_payload": {"message": "Summarise this"}}},
     {"id": "summarise", "type": "agent", "name": "Summarise", "position": {"x": 260, "y": 0},
-     "config": {"credential_id": "<an anthropic credential_id>", "model": "claude-haiku-4-5-20251001",
+     "config": {"model_id": "<a model_id from list_integrations>",
                 "user_prompt": "Summarise: {{ trigger.message }}"}},
     {"id": "result", "type": "output", "name": "Result", "position": {"x": 520, "y": 0},
      "config": {"value": "{{ nodes.summarise.output.text }}"}}
@@ -60,9 +60,11 @@ The example shows the shape only. Take each node's exact config fields from `get
   - `{{ trigger.<field> }}` reads the trigger payload. `{{ nodes.<id>.output.<field> }}` reads an upstream node, and only upstream nodes may be referenced.
   - `if` and `switch` expressions are bare, without braces, e.g. `nodes.classify.output.structured.urgency == 'high'`.
 - **Agents.**
-  - Set `credential_id` to an `anthropic` credential from `list_integrations`.
+  - Set `model_id` to a saved model from `list_integrations`. Reuse one whose provider and settings fit the task.
+  - If none fits, call `create_model` with a `provider`, the provider's model id, and a `credential_id` whose kind is in that provider's `credential_kinds` (see `model_providers`). Ask the user which provider and model they want first.
+  - If there is no matching credential, send the user to the Models page to add a key. Never ask for the key itself.
+  - Thinking (`settings.thinking`, one of the provider's `thinking_levels`) suits multi-step reasoning. Leave it `off` for quick classification and extraction. Temperature is dropped while thinking unless `temperature_with_thinking` is true.
   - An agent's output has `.text`, and `.structured` when `config.output_schema` is set. Set `output_schema` whenever later nodes branch on the answer.
-  - Use `claude-haiku-4-5-20251001` unless the task needs deeper reasoning, then `claude-sonnet-5`.
 - **Apps.**
   - GitHub, Slack, Notion, Linear and Tavily use a `connector_action` node with `connector_id`, `action` and `args`. Set `connection_id` from `list_integrations`, and prefer it over `http_request`.
   - The user's own APIs use `api_request` with `api_id`, `endpoint` and `args`. Their MCP servers use `mcp_tool`.
