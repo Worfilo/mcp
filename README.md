@@ -36,7 +36,10 @@ With Worfilo connected, you can ask your agent for an automation in plain langua
 3. **Builds** the workflow as a draft and resolves validation issues.
 4. **Tests** the draft with realistic input and repairs any failing nodes.
 5. **Publishes** a version once you approve it.
-6. **Integrates** it: creates an API key limited to that workflow, stores it in your environment file, and adds the API call to your code.
+6. **Integrates** it: creates an API key limited to that workflow, stores it in your environment file, and adds the API call to your code, with PDF upload when the workflow reads one.
+7. **Schedules** it, if you want it to run on a timer.
+
+When none of your connected MCP servers fits, the agent can search the official MCP registry and, once you agree, give you a link to connect one in Worfilo.
 
 Every workflow created this way is a standard Worfilo workflow. You can open it on the canvas, inspect its runs, and edit it like any other.
 
@@ -156,19 +159,23 @@ Coding agent --- MCP over HTTPS ---------------------> api.worfilo.com/mcp ---> 
 
 ## Tools
 
-The agent sees only the tools allowed by the permissions you grant. Publishing, activating versions and creating API keys are marked as consequential, so clients ask for confirmation before calling them.
+The agent sees only the tools allowed by the permissions you grant. Publishing, activating versions, creating API keys and deleting schedules are marked as consequential, so clients ask for confirmation before calling them.
 
 | Tool | Permission | Description |
 |---|---|---|
-| `list_node_types` | `workflows:read` | Node types available to workflow graphs |
+| `list_node_types` | `workflows:read` | Node types available to workflow graphs, with their ports and whether agents can use them as tools |
 | `get_node_type` | `workflows:read` | Ports and configuration schema for one node type |
-| `list_integrations` | `workflows:read` | Connected apps and actions, credential names, saved LLM models and provider options, custom APIs and MCP servers |
+| `list_integrations` | `workflows:read` | Connected apps and actions, credential names, saved LLM models and provider options, custom APIs and MCP servers with their connection status |
 | `list_workflows` | `workflows:read` | Workflows with publish state and latest run |
 | `get_workflow` | `workflows:read` | Draft graph, published versions and the active version |
 | `validate_workflow` | `workflows:read` | The checks that publishing runs |
 | `get_run` | `workflows:read` | Run status, output, and failing nodes |
-| `get_integration_snippet` | `workflows:read` | TypeScript, JavaScript, Python or curl code for the Workflow API |
-| `plan_workflow` | `workflows:write` | Drafts a graph and a readable plan without saving |
+| `list_runs` | `workflows:read` | A workflow's runs from the last 90 days |
+| `get_integration_snippet` | `workflows:read` | TypeScript, JavaScript, Python or curl code for the Workflow API, with a multipart version for workflows that read a PDF |
+| `list_schedules` | `workflows:read` | Schedules with their cron, timezone and next run |
+| `search_mcp_catalog` | `workflows:read` | Hosted servers from the official MCP registry that the account could connect |
+| `get_mcp_connect_link` | `workflows:read` | A link to connect a catalog server in Worfilo, called only after you agree |
+| `plan_workflow` | `workflows:write` | Drafts a graph, a readable plan and the models or connections to fill in, without saving |
 | `create_workflow` | `workflows:write` | Saves a new draft and returns validation issues |
 | `update_workflow` | `workflows:write` | Replaces a draft graph and returns validation issues |
 | `create_model` | `workflows:write` | Saves an LLM model (provider, model id, settings) on an existing credential, for agent nodes |
@@ -176,6 +183,9 @@ The agent sees only the tools allowed by the permissions you grant. Publishing, 
 | `activate_version` | `workflows:publish` | Selects the version the API runs |
 | `run_workflow` | `runs:write` | Runs the draft or published version and returns the result |
 | `create_api_key` | `api_keys:write` | Creates an API key limited to specific workflows |
+| `create_schedule` | `schedules:write` | Runs a published workflow on a cron schedule |
+| `update_schedule` | `schedules:write` | Changes a schedule's timing or payload, or pauses it |
+| `delete_schedule` | `schedules:write` | Removes a schedule |
 
 ## Permissions
 
@@ -188,6 +198,7 @@ You choose the permissions on the consent screen when the agent first connects.
 | `workflows:publish` | Publishing versions and changing the active version. |
 | `runs:write` | Running workflows and reading their results. |
 | `api_keys:write` | Creating API keys restricted to chosen workflows. |
+| `schedules:write` | Creating, changing and removing schedules for published workflows. |
 
 To review or revoke connected agents, open **API keys > Connected agents** in Worfilo. Revocation takes effect immediately.
 

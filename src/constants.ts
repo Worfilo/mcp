@@ -1,5 +1,5 @@
 export const PACKAGE = "@worfilo/mcp";
-export const VERSION = "0.2.0";
+export const VERSION = "0.3.0";
 export const SERVER_NAME = "worfilo";
 export const SKILL_NAME = "worfilo-workflows";
 export const DEFAULT_URL = "https://api.worfilo.com/mcp";
