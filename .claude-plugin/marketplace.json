@@ -12,7 +12,7 @@
       "name": "worfilo",
       "source": "./",
       "description": "The Worfilo MCP server and the /worfilo-workflows skill, for building AI workflows from Claude Code.",
-      "version": "0.3.0",
+      "version": "0.3.1",
       "category": "development"
     }
   ]

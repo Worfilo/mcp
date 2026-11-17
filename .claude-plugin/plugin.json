@@ -1,6 +1,6 @@
 {
   "name": "worfilo",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Plan, build, test, publish and integrate Worfilo AI workflows from Claude Code: the Worfilo MCP server plus the /worfilo-workflows skill.",
   "author": {
     "name": "Worfilo",
